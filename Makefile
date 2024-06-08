@@ -1,5 +1,5 @@
 TOOLS=\
-	github.com/cosmtrek/air@v1.45.0 \
+	github.com/air-verse/air@v1.52.2 \
 	github.com/pressly/goose/v3/cmd/goose@v3.15.0
 
 install-tools:
