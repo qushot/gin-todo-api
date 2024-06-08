@@ -1,10 +1,10 @@
 # gin-todo-api
 
-gin-gonic お試ししてみようかなーと思ってたけど、どうでもよくなってきた。
+[gin-gonic/gin](https://github.com/gin-gonic/gin)を使って適当に作った TODO API。
 
 ## 利用ツール
 
-- Live Reload: https://github.com/cosmtrek/air
+- Live Reload: https://github.com/air-verse/air
 - Database Migration: https://github.com/pressly/goose
 
 ## やること

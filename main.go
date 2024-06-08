@@ -1,45 +1,128 @@
 package main
 
 import (
-	"log/slog"
+	"log"
 	"net/http"
-	"os"
+	"slices"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
+type todo struct {
+	ID      string `json:"id"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	Done    bool   `json:"done"`
+}
+
+type todos struct {
+	Todos []todo `json:"todos"`
+}
+
+var defaultTodos = todos{
+	Todos: []todo{
+		{ID: "1", Title: "title1", Content: "content1", Done: false},
+		{ID: "2", Title: "title2", Content: "content2", Done: true},
+	},
+}
+
 func main() {
-	// slog setting
-	h := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		AddSource: false,
-		Level:     slog.LevelDebug,
-		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
-			if a.Key == slog.MessageKey {
-				a.Key = "message"
-			}
+	gin.SetMode(gin.DebugMode)
+	router := gin.Default()
 
-			if a.Key == slog.LevelKey {
-				a.Key = "severity"
-			}
+	baseRouter := router.Group("/api/v1")
+	{
+		newTodoHandler(baseRouter).handle()
+	}
 
-			return a
-		},
+	if err := router.Run(); err != nil {
+		log.Fatalf("router.Run error: %v", err)
+	}
+}
+
+type todoHandler struct {
+	r *gin.RouterGroup
+}
+
+func newTodoHandler(base *gin.RouterGroup) *todoHandler {
+	return &todoHandler{
+		r: base.Group("/todos"),
+	}
+}
+
+func (t *todoHandler) handle() {
+	t.r.GET("", t.list)
+	t.r.POST("", t.create)
+	t.r.GET("/:id", t.read)
+	t.r.PUT("/:id", t.update)
+	t.r.DELETE("/:id", t.delete)
+}
+
+func (*todoHandler) list(c *gin.Context) {
+	c.JSON(http.StatusOK, defaultTodos)
+}
+
+func (*todoHandler) create(c *gin.Context) {
+	var req todo
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	t := todo{
+		ID:      strconv.Itoa(len(defaultTodos.Todos) + 1),
+		Title:   req.Title,
+		Content: req.Content,
+		Done:    false,
+	}
+	defaultTodos.Todos = append(defaultTodos.Todos, t)
+	c.JSON(http.StatusCreated, t)
+}
+
+func (*todoHandler) read(c *gin.Context) {
+	id := c.Param("id")
+	idx := slices.IndexFunc(defaultTodos.Todos, func(t todo) bool {
+		return t.ID == id
 	})
-	slog.SetDefault(slog.New(h))
+	if idx == -1 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		return
+	}
+	c.JSON(http.StatusOK, defaultTodos.Todos[idx])
+}
 
-	// gin setting
-	gin.SetMode(gin.ReleaseMode)
-	r := gin.Default()
-	r.Use(func(c *gin.Context) {
-		slog.InfoContext(c.Request.Context(), "middleware")
+func (*todoHandler) update(c *gin.Context) {
+	id := c.Param("id")
+	var req todo
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	idx := slices.IndexFunc(defaultTodos.Todos, func(t todo) bool {
+		return t.ID == id
 	})
+	if idx == -1 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		return
+	}
+	defaultTodos.Todos[idx] = todo{
+		ID:      id,
+		Title:   req.Title,
+		Content: req.Content,
+		Done:    req.Done,
+	}
+	c.JSON(http.StatusOK, defaultTodos.Todos[idx])
+}
 
-	r.GET("/ping", func(c *gin.Context) {
-		s := "world"
-		slog.InfoContext(c.Request.Context(), "called", slog.String("hello", s))
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
+func (*todoHandler) delete(c *gin.Context) {
+	id := c.Param("id")
+	idx := slices.IndexFunc(defaultTodos.Todos, func(t todo) bool {
+		return t.ID == id
 	})
-	r.Run()
+	if idx == -1 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		return
+	}
+	defaultTodos.Todos = append(defaultTodos.Todos[:idx], defaultTodos.Todos[idx+1:]...)
+	c.JSON(http.StatusOK, defaultTodos)
 }
