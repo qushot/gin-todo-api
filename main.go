@@ -20,6 +20,10 @@ type todos struct {
 	Todos []todo `json:"todos"`
 }
 
+type todoQuery struct {
+	Status string `form:"status"`
+}
+
 var defaultTodos = todos{
 	Todos: []todo{
 		{ID: "1", Title: "title1", Content: "content1", Done: false},
@@ -60,12 +64,32 @@ func (t *todoHandler) handle() {
 }
 
 func (*todoHandler) list(c *gin.Context) {
+	var query todoQuery
+	if err := c.ShouldBindQuery(&query); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if query.Status != "" {
+		wasDone := true
+		if query.Status != "done" {
+			wasDone = false
+		}
+		var todos []todo
+		for _, t := range defaultTodos.Todos {
+			if t.Done == wasDone {
+				todos = append(todos, t)
+			}
+		}
+		c.JSON(http.StatusOK, todos)
+		return
+	}
 	c.JSON(http.StatusOK, defaultTodos)
 }
 
 func (*todoHandler) create(c *gin.Context) {
 	var req todo
-	if err := c.BindJSON(&req); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -94,7 +118,7 @@ func (*todoHandler) read(c *gin.Context) {
 func (*todoHandler) update(c *gin.Context) {
 	id := c.Param("id")
 	var req todo
-	if err := c.BindJSON(&req); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
