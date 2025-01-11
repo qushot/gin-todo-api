@@ -1,0 +1,20 @@
+name: reviewdog
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  golangci-lint:
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.github_token }}
+          golangci_lint_flags: "--config=.golangci.yml --timeout=2m"
+          level: "warning"
+          reporter: github-pr-review
