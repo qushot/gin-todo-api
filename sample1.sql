@@ -1,1 +1,1 @@
-select count(*) from sample_table;
+SELECT COUNT(*) FROM sample_table;
