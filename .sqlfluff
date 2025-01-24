@@ -1,0 +1,44 @@
+[sqlfluff]
+max_line_length = 120
+large_file_skip_byte_limit = 200000
+# 除外するルールを指定する
+exclude_rules =
+    # 大文字小文字の識別子を変更しない
+    L014
+    # カラムの順番を変更しない
+    , L034
+# 使用するSQLの方言を指定する
+dialect = postgres
+# テンプレートの設定
+templater = placeholder
+
+[sqlfluff:templater:placeholder]
+# ? マークをプレースホルダーとして使用する(jmoiron/sqlx などでのプレースホルダー)
+# https://docs.sqlfluff.com/en/latest/configuration/templating/placeholder.html
+param_style = question_mark
+
+[sqlfluff:rules]
+# allow_scalar = True
+# single_table_references = consistent
+# unquoted_identifiers_policy = all
+
+[sqlfluff:indentation]
+indent_unit = space
+tab_space_size = 2
+
+# 予約語を大文字 (e.g., SELECT, FROM, etc.)
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = upper
+# 関数名を大文字 (e.g., SUM, COUNT, etc.)
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = upper
+# リテラル値を大文字 (e.g., NULL, TRUE, etc.)
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = upper
+
+[sqlfluff:rules:convention.quoted_literals]
+preferred_quoted_literal_style = single_quotes
+
+# 前置カンマを強制
+[sqlfluff:layout:type:comma]
+line_position = leading
