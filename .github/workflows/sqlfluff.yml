@@ -1,0 +1,34 @@
+name: SQLFluff
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sqlfluff:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install sqlfluff
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - run: sqlfluff fix --config=.sqlfluff
+      - name: Check diff
+        id: diff
+        run: |
+          git add -N .
+          git diff --name-only --exit-code
+        continue-on-error: true
+      - name: Commit & Push
+        if: steps.diff.outcome == 'failure'
+        run: |
+          set -x
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .
+          git commit -m 'exec: sqlfluff fix by github actions'
+          git push
