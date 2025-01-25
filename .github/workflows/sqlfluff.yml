@@ -2,6 +2,9 @@ name: SQLFluff
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - "**/*.sql"
+      - "**/.sqlfluff"
 
 jobs:
   sqlfluff:
