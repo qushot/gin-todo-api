@@ -10,13 +10,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS todo (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), -- noqa: CP03
-  title text NOT NULL,
-  content text,
-  done bool NOT NULL DEFAULT FALSE,
-  version int NOT NULL DEFAULT 1,
-  created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-  updated_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid() -- noqa: CP03
+  , title TEXT NOT NULL
+  , content TEXT
+  , done BOOL NOT NULL DEFAULT FALSE
+  , version INT NOT NULL DEFAULT 1
+  , created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 COMMENT ON TABLE todo IS 'ToDo';
 COMMENT ON COLUMN todo.id IS 'ID';
