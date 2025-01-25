@@ -1,9 +1,10 @@
-select
-foo,
-bar,
-baz,
-qux
-from sample_table
-where foo = 'foooo' and 
-bar = 'baaar' and 
-baz = 'baaaz';
+SELECT
+  foo
+  , bar
+  , baz
+  , qux
+FROM sample_table
+WHERE
+  foo = 'foooo'
+  AND bar = 'baaar'
+  AND baz = 'baaaz';
