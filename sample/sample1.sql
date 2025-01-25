@@ -1,6 +1,6 @@
-select
-foo,
-bar,
-baz
-from sample_table
-where foo = 'foooo' and bar = 'baaar' and baz = 'baaaz';
+SELECT
+  foo
+  , bar
+  , baz
+FROM sample_table
+WHERE foo = 'foooo' AND bar = 'baaar' AND baz = 'baaaz';
