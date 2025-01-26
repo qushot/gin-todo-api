@@ -20,5 +20,8 @@ postgres-exec:
 	@docker compose exec postgres psql -U postgres -d postgres
 .PHONY: postgres-up postgres-down postgres-volumes-down postgres-logs postgres-exec
 
+tbls:
+	@docker compose run --rm tbls
+
 run:
 	@air

@@ -1,0 +1,7 @@
+# Path to generate document
+# Default is `dbdoc`
+docPath: postgres/schema
+er:
+# Add table/column comment to ER diagram
+# Default is false
+comment: true
