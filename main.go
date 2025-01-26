@@ -1,12 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
-	"slices"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 )
 
 type todo struct {
@@ -16,22 +16,23 @@ type todo struct {
 	Done    bool   `json:"done"`
 }
 
-type todos struct {
-	Todos []todo `json:"todos"`
-}
-
 type todoQuery struct {
 	Status string `form:"status"`
 }
 
-var defaultTodos = todos{
-	Todos: []todo{
-		{ID: "1", Title: "title1", Content: "content1", Done: false},
-		{ID: "2", Title: "title2", Content: "content2", Done: true},
-	},
+var conn *pgx.Conn
+
+func init() {
+	var err error
+	conn, err = pgx.Connect(context.Background(), "postgres://postgres:pass@localhost:5432/postgres")
+	if err != nil {
+		log.Fatalf("pgx.Connect error: %v", err)
+	}
 }
 
 func main() {
+	defer conn.Close(context.Background())
+
 	gin.SetMode(gin.DebugMode)
 	router := gin.Default()
 
@@ -39,6 +40,8 @@ func main() {
 	{
 		newTodoHandler(baseRouter).handle()
 	}
+
+	// TODO: graceful shutdown
 
 	if err := router.Run(); err != nil {
 		log.Fatalf("router.Run error: %v", err)
@@ -70,21 +73,21 @@ func (*todoHandler) list(c *gin.Context) {
 		return
 	}
 
-	if query.Status != "" {
-		wasDone := true
-		if query.Status != "done" {
-			wasDone = false
-		}
-		var todos []todo
-		for _, t := range defaultTodos.Todos {
-			if t.Done == wasDone {
-				todos = append(todos, t)
-			}
-		}
-		c.JSON(http.StatusOK, todos)
+	var todos []todo
+	rows, err := conn.Query(context.Background(), "SELECT id, title, content, done FROM todo")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, defaultTodos)
+	for rows.Next() {
+		var t todo
+		if err := rows.Scan(&t.ID, &t.Title, &t.Content, &t.Done); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		todos = append(todos, t)
+	}
+	c.JSON(http.StatusOK, todos)
 }
 
 func (*todoHandler) create(c *gin.Context) {
@@ -93,26 +96,27 @@ func (*todoHandler) create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	t := todo{
-		ID:      strconv.Itoa(len(defaultTodos.Todos) + 1),
-		Title:   req.Title,
-		Content: req.Content,
-		Done:    false,
+	var t todo
+	if err := conn.QueryRow(context.Background(), "INSERT INTO todo (title, content, done) VALUES ($1, $2, $3) RETURNING id, title, content, done", req.Title, req.Content, req.Done).Scan(&t.ID, &t.Title, &t.Content, &t.Done); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	defaultTodos.Todos = append(defaultTodos.Todos, t)
+
 	c.JSON(http.StatusCreated, t)
 }
 
 func (*todoHandler) read(c *gin.Context) {
 	id := c.Param("id")
-	idx := slices.IndexFunc(defaultTodos.Todos, func(t todo) bool {
-		return t.ID == id
-	})
-	if idx == -1 {
+
+	var t todo
+	if err := conn.QueryRow(context.Background(), "SELECT id, title, content, done FROM todo WHERE id = $1", id).Scan(&t.ID, &t.Title, &t.Content, &t.Done); err == pgx.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	c.JSON(http.StatusOK, defaultTodos.Todos[idx])
+	c.JSON(http.StatusOK, t)
 }
 
 func (*todoHandler) update(c *gin.Context) {
@@ -122,31 +126,26 @@ func (*todoHandler) update(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	idx := slices.IndexFunc(defaultTodos.Todos, func(t todo) bool {
-		return t.ID == id
-	})
-	if idx == -1 {
+
+	var t todo
+	if err := conn.QueryRow(context.Background(), "UPDATE todo SET title = $2, content = $3, done = $4 WHERE id = $1 RETURNING id, title, content, done", id, req.Title, req.Content, req.Done).Scan(&t.ID, &t.Title, &t.Content, &t.Done); err == pgx.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	defaultTodos.Todos[idx] = todo{
-		ID:      id,
-		Title:   req.Title,
-		Content: req.Content,
-		Done:    req.Done,
-	}
-	c.JSON(http.StatusOK, defaultTodos.Todos[idx])
+	c.JSON(http.StatusOK, t)
 }
 
 func (*todoHandler) delete(c *gin.Context) {
 	id := c.Param("id")
-	idx := slices.IndexFunc(defaultTodos.Todos, func(t todo) bool {
-		return t.ID == id
-	})
-	if idx == -1 {
+	if err := conn.QueryRow(context.Background(), "DELETE FROM todo WHERE id = $1 RETURNING id", id).Scan(); err == pgx.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	defaultTodos.Todos = append(defaultTodos.Todos[:idx], defaultTodos.Todos[idx+1:]...)
-	c.JSON(http.StatusOK, defaultTodos)
+	c.JSON(http.StatusNoContent, nil)
 }
