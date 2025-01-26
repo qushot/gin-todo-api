@@ -14,5 +14,17 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres/init:/docker-entrypoint-initdb.d
+
+  tbls:
+    image: ghcr.io/k1low/tbls:latest
+    user: 1000:1000
+    working_dir: /work_tbls
+    volumes:
+      - .:/work_tbls
+    depends_on:
+      - postgres
+    entrypoint: >
+      tbls doc --rm-dist
+
 volumes:
   postgres_data:

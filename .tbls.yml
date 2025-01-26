@@ -1,0 +1,9 @@
+# DSN (Database Source Name) to connect database
+dsn: postgres://postgres:pass@postgres:5432/postgres?search_path=public&sslmode=disable
+# Path to generate document
+# Default is `dbdoc`
+docPath: postgres/schema
+er:
+# Add table/column comment to ER diagram
+# Default is false
+comment: true
