@@ -5,6 +5,8 @@
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
 | [public.todo](public.todo.md) | 7 | ToDo | BASE TABLE |
+| [public.sample1](public.sample1.md) | 5 | sample1 | BASE TABLE |
+| [public.sample2](public.sample2.md) | 6 | sample2 | BASE TABLE |
 
 ## Stored procedures and functions
 
