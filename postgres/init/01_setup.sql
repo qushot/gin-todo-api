@@ -34,7 +34,7 @@ COMMENT ON TRIGGER trg_todo_version_updated_at ON todo IS 'バージョンと更
 
 CREATE TABLE IF NOT EXISTS sample (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid() -- noqa: CP03
-  , todo_id UUID REFERENCES todo(id)
+  , todo_id UUID REFERENCES todo (id)
   , version INT NOT NULL DEFAULT 1
   , created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
   , updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
