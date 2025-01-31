@@ -1,17 +1,15 @@
-# public.todo
+# public.sample
 
 ## Description
 
-ToDo
+sample
 
 ## Columns
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| id | uuid | gen_random_uuid() | false | [public.sample](public.sample.md) |  | ID |
-| title | text |  | false |  |  | タイトル |
-| content | text |  | true |  |  | 内容 |
-| done | boolean | false | false |  |  | 完了フラグ |
+| id | uuid | gen_random_uuid() | false |  |  | ID |
+| todo_id | uuid |  | true |  | [public.todo](public.todo.md) | ToDo ID |
 | version | integer | 1 | false |  |  | バージョン |
 | created_at | timestamp without time zone | CURRENT_TIMESTAMP | false |  |  | 作成日時 |
 | updated_at | timestamp without time zone | CURRENT_TIMESTAMP | false |  |  | 更新日時 |
@@ -20,23 +18,24 @@ ToDo
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
-| todo_pkey | PRIMARY KEY | PRIMARY KEY (id) |
+| sample_todo_id_fkey | FOREIGN KEY | FOREIGN KEY (todo_id) REFERENCES todo(id) |
+| sample_pkey | PRIMARY KEY | PRIMARY KEY (id) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
-| todo_pkey | CREATE UNIQUE INDEX todo_pkey ON public.todo USING btree (id) |
+| sample_pkey | CREATE UNIQUE INDEX sample_pkey ON public.sample USING btree (id) |
 
 ## Triggers
 
 | Name | Definition | Comment |
 | ---- | ---------- | ------- |
-| trg_todo_version_updated_at | CREATE TRIGGER trg_todo_version_updated_at BEFORE UPDATE ON public.todo FOR EACH ROW EXECUTE FUNCTION set_version_updated_at() | バージョンと更新日時を更新するトリガー |
+| trg_sample_version_updated_at | CREATE TRIGGER trg_sample_version_updated_at BEFORE UPDATE ON public.sample FOR EACH ROW EXECUTE FUNCTION set_version_updated_at() | バージョンと更新日時を更新するトリガー |
 
 ## Relations
 
-![er](public.todo.svg)
+![er](public.sample.svg)
 
 ---
 
