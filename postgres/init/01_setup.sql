@@ -30,3 +30,21 @@ COMMENT ON COLUMN todo.updated_at IS '更新日時';
 CREATE OR REPLACE TRIGGER trg_todo_version_updated_at
 BEFORE UPDATE ON todo FOR EACH ROW EXECUTE PROCEDURE set_version_updated_at(); -- noqa: CP03
 COMMENT ON TRIGGER trg_todo_version_updated_at ON todo IS 'バージョンと更新日時を更新するトリガー';
+
+CREATE TABLE IF NOT EXISTS sample (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid() -- noqa: CP03
+  , todo_id UUID REFERENCES todo(id)
+  , version INT NOT NULL DEFAULT 1
+  , created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+COMMENT ON TABLE sample IS 'sample';
+COMMENT ON COLUMN sample.id IS 'ID';
+COMMENT ON COLUMN sample.todo_id IS 'ToDo ID';
+COMMENT ON COLUMN sample.version IS 'バージョン';
+COMMENT ON COLUMN sample.created_at IS '作成日時';
+COMMENT ON COLUMN sample.updated_at IS '更新日時';
+
+CREATE OR REPLACE TRIGGER trg_sample_version_updated_at
+BEFORE UPDATE ON sample FOR EACH ROW EXECUTE PROCEDURE set_version_updated_at(); -- noqa: CP03
+COMMENT ON TRIGGER trg_sample_version_updated_at ON sample IS 'バージョンと更新日時を更新するトリガー';
