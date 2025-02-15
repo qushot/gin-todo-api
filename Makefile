@@ -1,27 +1,27 @@
-TOOLS=\
-	github.com/air-verse/air@v1.52.2 \
-	github.com/pressly/goose/v3/cmd/goose@v3.15.0
+.PHONY: run
+run: postgres-up
+	@go tool air
 
-install-tools:
-	@for tool in $(TOOLS); do \
-		echo "Installing $$tool"; \
-		go install $$tool; \
-	done
-
+.PHONY: postgres-up
 postgres-up:
 	@docker compose up -d postgres
+
+.PHONY: postgres-down
 postgres-down:
 	@docker compose down postgres
+
+.PHONY: postgres-volumes-down
 postgres-volumes-down:
 	@docker compose down -v postgres
+
+.PHONY: postgres-logs
 postgres-logs:
 	@docker compose logs -f postgres
+
+.PHONY: postgres-exec
 postgres-exec:
 	@docker compose exec postgres psql -U postgres -d postgres
-.PHONY: postgres-up postgres-down postgres-volumes-down postgres-logs postgres-exec
 
+.PHONY: tbls
 tbls:
 	@docker compose run --rm tbls
-
-run:
-	@air
