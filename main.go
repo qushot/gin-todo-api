@@ -140,7 +140,7 @@ func (*todoHandler) update(c *gin.Context) {
 
 func (*todoHandler) delete(c *gin.Context) {
 	id := c.Param("id")
-	if err := conn.QueryRow(context.Background(), "DELETE FROM todo WHERE id = $1 RETURNING id", id).Scan(); err == pgx.ErrNoRows {
+	if _, err := conn.Exec(context.Background(), "DELETE FROM todo WHERE id = $1", id); err == pgx.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
 	} else if err != nil {
