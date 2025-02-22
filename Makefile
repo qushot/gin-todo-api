@@ -22,6 +22,10 @@ postgres-logs:
 postgres-exec:
 	@docker compose exec postgres psql -U postgres -d postgres
 
+.PHONY: openapi-generator
+openapi-generator:
+	@docker compose run --rm openapi-generator
+
 .PHONY: tbls
 tbls:
 	@docker compose run --rm tbls
