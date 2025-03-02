@@ -3,4 +3,9 @@
     "go.lintFlags": [
         "--fast"
     ],
+
+    "sqlfluff.format.enabled": true,
+    "sqlfluff.config": "${workspaceFolder}/.sqlfluff",
+    "sqlfluff.dialect": "postgres",
+    "sqlfluff.linter.run": "onType",
 }
