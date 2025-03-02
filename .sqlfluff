@@ -39,6 +39,10 @@ capitalisation_policy = upper
 [sqlfluff:rules:convention.quoted_literals]
 preferred_quoted_literal_style = single_quotes
 
+[sqlfluff:rules:convention.terminator]
+multiline_newline = True
+require_final_semicolon = True
+
 # 前置カンマを強制
 [sqlfluff:layout:type:comma]
 line_position = leading
