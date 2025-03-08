@@ -128,6 +128,22 @@ func DumpRequestBody(next http.Handler) http.Handler {
 	})
 }
 
+// panic から回復するミドルウェア
+func Recover(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		defer func(ctx context.Context) {
+			if rcr := recover(); rcr != nil {
+				slog.ErrorContext(ctx, fmt.Sprintf("%+v", rcr))
+				// TODO: エラーレスポンスを返す
+				http.Error(w, "panic", http.StatusInternalServerError)
+			}
+		}(r.Context())
+
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
+}
+
 func main() {
 	defer conn.Close(context.Background())
 
