@@ -155,11 +155,23 @@ func SetTraceContext(next http.Handler) http.Handler {
 	})
 }
 
+func SetupMiddlewares(c *gin.Context) {
+	hf := http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		c.Request = r
+		c.Next()
+	})
+	m := SetTraceContext(DumpRequestBody(Recover(hf)))
+
+	// Gin の ResponseWriter, Request を渡す
+	m.ServeHTTP(c.Writer, c.Request)
+}
+
 func main() {
 	defer conn.Close(context.Background())
 
 	gin.SetMode(gin.DebugMode)
 	router := gin.Default()
+	router.Use(SetupMiddlewares)
 
 	baseRouter := router.Group("/api/v1")
 	{
