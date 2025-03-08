@@ -10,6 +10,8 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
@@ -167,8 +169,6 @@ func SetupMiddlewares(c *gin.Context) {
 }
 
 func main() {
-	defer conn.Close(context.Background())
-
 	gin.SetMode(gin.DebugMode)
 	router := gin.Default()
 	router.Use(SetupMiddlewares)
@@ -178,12 +178,39 @@ func main() {
 		newTodoHandler(baseRouter).handle()
 	}
 
-	// TODO: graceful shutdown
+	// graceful shutdown
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
 
-	if err := router.Run(); err != nil {
-		slog.Error("router.Run error", slog.Any("error", err))
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			slog.Error("server.ListenAndServe error", slog.Any("error", err))
+			return
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+
+	slog.Info("Shutting down server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		slog.Error("server.Shutdown error", slog.Any("error", err))
 		return
 	}
+
+	// Close the database connection
+	if err := conn.Close(ctx); err != nil {
+		slog.Error("conn.Close error", slog.Any("error", err))
+		return
+	}
+
+	slog.Info("Server exiting")
 }
 
 type todoHandler struct {
