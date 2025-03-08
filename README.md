@@ -20,11 +20,11 @@
 ## エンドポイントメモ
 
 ```sh
-curl localhost:8080/api/v1/todos
-curl localhost:8080/api/v1/todos/{id}
-curl localhost:8080/api/v1/todos -X POST -H "Content-Type: application/json" -d '{"title": "title3", "content": "content3", "done": false}'
-curl localhost:8080/api/v1/todos/{id} -X PUT -H "Content-Type: application/json" -d '{"title": "updated title3", "content": "updated content3", "done": true}'
-curl localhost:8080/api/v1/todos/{id} -X DELETE
+curl localhost:8080/api/v1/todos -H "traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
+curl localhost:8080/api/v1/todos/{id} -H "traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
+curl localhost:8080/api/v1/todos -X POST --json '{"title": "title3", "content": "content3", "done": false}' -H "traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
+curl localhost:8080/api/v1/todos/{id} -X PUT --json '{"title": "updated title3", "content": "updated content3", "done": true}' -H "traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
+curl localhost:8080/api/v1/todos/{id} -X DELETE -H "traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
 ```
 
 ## opanapi-generator メモ
