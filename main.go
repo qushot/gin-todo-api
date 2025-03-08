@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -63,8 +62,11 @@ func init() {
 	var err error
 	conn, err = pgx.Connect(context.Background(), "postgres://postgres:pass@localhost:5432/postgres")
 	if err != nil {
-		log.Fatalf("pgx.Connect error: %v", err)
+		slog.Error("pgx.Connect error", slog.Any("error", err))
+		return
 	}
+
+	slog.Info("Database connected")
 }
 
 // customJSONHandler is a custom handler for slog.JSONHandler
@@ -107,7 +109,8 @@ func main() {
 	// TODO: graceful shutdown
 
 	if err := router.Run(); err != nil {
-		log.Fatalf("router.Run error: %v", err)
+		slog.Error("router.Run error", slog.Any("error", err))
+		return
 	}
 }
 
