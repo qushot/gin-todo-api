@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"cmp"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
@@ -93,6 +95,37 @@ func NewCustomJSONHandler(w io.Writer, opts *slog.HandlerOptions) slog.Handler {
 	return &customJSONHandler{
 		JSONHandler: slog.NewJSONHandler(w, opts),
 	}
+}
+
+// HTTP Request Body をダンプするミドルウェア
+func DumpRequestBody(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		defer next.ServeHTTP(w, r)
+
+		if r.Method == http.MethodPost || r.Method == http.MethodPut || r.Method == http.MethodPatch {
+			body, err := io.ReadAll(r.Body)
+			if err != nil {
+				slog.WarnContext(ctx, err.Error())
+				return
+			}
+
+			// リクエストボディは一度読み込むとCloseされて読み込めなくなるため、読み込んだ内容を再度Bodyにセットする
+			r.Body = io.NopCloser(bytes.NewReader(body))
+
+			// JSON形式として不正な場合はそのまま文字列として出力する
+			if json.Valid(body) {
+				m := make(map[string]any)
+				if err := json.Unmarshal(body, &m); err != nil {
+					slog.WarnContext(ctx, err.Error())
+				}
+				slog.InfoContext(ctx, "", slog.Any("requestBody", m))
+				return
+			}
+			slog.InfoContext(ctx, "", slog.String("requestBody", string(body)))
+		}
+	})
 }
 
 func main() {
