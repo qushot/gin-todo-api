@@ -26,8 +26,6 @@ linters:
     - errorlint
     - funlen
     - gocheckcompilerdirectives
-    - gochecknoinits
-    - gochecknoinits
     - goconst
     - gocritic
     - gocyclo
@@ -41,7 +39,6 @@ linters:
     - govet
     - intrange
     - ineffassign
-    - lll
     - misspell
     - nakedret
     - noctx
