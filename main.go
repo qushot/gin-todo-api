@@ -13,6 +13,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -142,6 +143,16 @@ func Recover(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	}
 	return http.HandlerFunc(fn)
+}
+
+// SetTraceContext is a middleware that extracts the trace context from the incoming request and sets it in the request context
+func SetTraceContext(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tc := propagation.TraceContext{}
+		ctx := tc.Extract(r.Context(), propagation.HeaderCarrier(r.Header))
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
 
 func main() {
