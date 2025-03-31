@@ -2,11 +2,9 @@ module github.com/qushot/gin-todo-api
 
 go 1.24
 
-toolchain go1.24.0
-
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/jackc/pgx/v5 v5.7.2
+	github.com/jackc/pgx/v5 v5.7.4
 	go.opentelemetry.io/otel v1.35.0
 	go.opentelemetry.io/otel/trace v1.35.0
 )
