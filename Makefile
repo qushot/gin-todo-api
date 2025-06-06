@@ -2,6 +2,10 @@
 run: postgres-up
 	@go tool air
 
+.PHONY: build-mcp
+build-mcp:
+	@go build -o mcp ./mcp
+
 .PHONY: postgres-up
 postgres-up:
 	@docker compose up -d postgres
