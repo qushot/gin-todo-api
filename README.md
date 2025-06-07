@@ -12,10 +12,16 @@
 - [x] air の導入
 - [x] .air.toml の設定
 - [ ] データベースの設定
+- [ ] SQL 文 をファイルに切り出す
+- [ ] StackTrace のライブラリをいくつか試したい
+- [ ] ビルドタグで on-memory と PostgreSQL を切り替えたい
+- [ ] MCP サーバーで API を操作したい
+  - API をラップした MCP は作ってみた。そのうち cmd/mcp 的な感じでディレクトリを掘っていい感じにしたい。。
 
 ## マジで全然関係ないメモ
 
 - Toml のリポジトリ: https://github.com/toml-lang/toml
+- PostgreSQL 用のサンプル DB: https://qiita.com/pea1205/items/979ec46bff5bd7c1134f#world
 
 ## エンドポイントメモ
 
