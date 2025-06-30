@@ -8,8 +8,8 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/mark3labs/mcp-go v0.31.0
-	go.opentelemetry.io/otel v1.35.0
-	go.opentelemetry.io/otel/trace v1.35.0
+	go.opentelemetry.io/otel v1.37.0
+	go.opentelemetry.io/otel/trace v1.37.0
 )
 
 require (
