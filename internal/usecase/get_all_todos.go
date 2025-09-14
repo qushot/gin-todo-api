@@ -7,24 +7,24 @@ import (
 	"github.com/qushot/gin-todo-api/internal/domain/repository"
 )
 
-// GetAllTodosUseCase はすべてのTodoを取得するユースケースを表すインターフェース
-type GetAllTodosUseCase interface {
+// GetAllTodos はすべてのTodoを取得するユースケースを表すインターフェース
+type GetAllTodos interface {
 	Execute(ctx context.Context, query model.TodoQuery) ([]model.Todo, error)
 }
 
-// getAllTodosUseCase はGetAllTodosUseCaseの実装
-type getAllTodosUseCase struct {
-	todoRepo repository.TodoRepository
+// getAllTodos は usecase.GetAllTodos の実装
+type getAllTodos struct {
+	todoRepo repository.Todo
 }
 
-// NewGetAllTodosUseCase は全てのTodoを取得するユースケースのコンストラクタ
-func NewGetAllTodosUseCase(todoRepo repository.TodoRepository) GetAllTodosUseCase {
-	return &getAllTodosUseCase{
+// NewGetAllTodos は usecase.GetAllTodos のコンストラクタ
+func NewGetAllTodos(todoRepo repository.Todo) GetAllTodos {
+	return &getAllTodos{
 		todoRepo: todoRepo,
 	}
 }
 
 // Execute は全てのTodoを取得する
-func (uc *getAllTodosUseCase) Execute(ctx context.Context, query model.TodoQuery) ([]model.Todo, error) {
+func (uc *getAllTodos) Execute(ctx context.Context, query model.TodoQuery) ([]model.Todo, error) {
 	return uc.todoRepo.FindAll(ctx, query)
 }

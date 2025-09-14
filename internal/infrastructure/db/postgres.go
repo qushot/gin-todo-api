@@ -10,8 +10,8 @@ import (
 // DBConn はデータベース接続を表す
 var conn *pgx.Conn
 
-// InitializeDB はデータベース接続を初期化する
-func InitializeDB(connectionString string) (*pgx.Conn, error) {
+// Initialize はデータベース接続を初期化する
+func Initialize(connectionString string) (*pgx.Conn, error) {
 	var err error
 	conn, err = pgx.Connect(context.Background(), connectionString)
 	if err != nil {

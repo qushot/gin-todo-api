@@ -7,24 +7,24 @@ import (
 	"github.com/qushot/gin-todo-api/internal/domain/repository"
 )
 
-// UpdateTodoUseCase はTodoを更新するユースケースを表すインターフェース
-type UpdateTodoUseCase interface {
+// UpdateTodo はTodoを更新するユースケースを表すインターフェース
+type UpdateTodo interface {
 	Execute(ctx context.Context, id string, todo model.Todo) (*model.Todo, error)
 }
 
-// updateTodoUseCase はUpdateTodoUseCaseの実装
-type updateTodoUseCase struct {
-	todoRepo repository.TodoRepository
+// updateTodo は usecase.UpdateTodo の実装
+type updateTodo struct {
+	todoRepo repository.Todo
 }
 
-// NewUpdateTodoUseCase はTodoを更新するユースケースのコンストラクタ
-func NewUpdateTodoUseCase(todoRepo repository.TodoRepository) UpdateTodoUseCase {
-	return &updateTodoUseCase{
+// NewUpdateTodo は usecase.UpdateTodo のコンストラクタ
+func NewUpdateTodo(todoRepo repository.Todo) UpdateTodo {
+	return &updateTodo{
 		todoRepo: todoRepo,
 	}
 }
 
 // Execute はTodoを更新する
-func (uc *updateTodoUseCase) Execute(ctx context.Context, id string, todo model.Todo) (*model.Todo, error) {
+func (uc *updateTodo) Execute(ctx context.Context, id string, todo model.Todo) (*model.Todo, error) {
 	return uc.todoRepo.Update(ctx, id, todo)
 }

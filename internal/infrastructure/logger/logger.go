@@ -37,8 +37,8 @@ func NewCustomJSONHandler(w io.Writer, opts *slog.HandlerOptions) slog.Handler {
 	}
 }
 
-// InitializeLogger はロガーを初期化する
-func InitializeLogger() {
+// Initialize はロガーを初期化する
+func Initialize() {
 	// ログメッセージのkeyをCloud Logging向けに変更
 	replace := func(_ []string, a slog.Attr) slog.Attr {
 		if a.Key == slog.MessageKey {

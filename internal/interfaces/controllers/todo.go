@@ -10,24 +10,24 @@ import (
 	"github.com/qushot/gin-todo-api/internal/usecase"
 )
 
-// TodoController はTodo操作のためのコントローラー
-type TodoController struct {
-	getAllTodosUseCase usecase.GetAllTodosUseCase
-	getTodoByIDUseCase usecase.GetTodoByIDUseCase
-	createTodoUseCase  usecase.CreateTodoUseCase
-	updateTodoUseCase  usecase.UpdateTodoUseCase
-	deleteTodoUseCase  usecase.DeleteTodoUseCase
+// Todo はTodo操作のためのコントローラー
+type Todo struct {
+	getAllTodosUseCase usecase.GetAllTodos
+	getTodoByIDUseCase usecase.GetTodoByID
+	createTodoUseCase  usecase.CreateTodo
+	updateTodoUseCase  usecase.UpdateTodo
+	deleteTodoUseCase  usecase.DeleteTodo
 }
 
-// NewTodoController はTodoControllerのコンストラクタ
-func NewTodoController(
-	getAllTodosUseCase usecase.GetAllTodosUseCase,
-	getTodoByIDUseCase usecase.GetTodoByIDUseCase,
-	createTodoUseCase usecase.CreateTodoUseCase,
-	updateTodoUseCase usecase.UpdateTodoUseCase,
-	deleteTodoUseCase usecase.DeleteTodoUseCase,
-) *TodoController {
-	return &TodoController{
+// NewTodo は controllers.Todo のコンストラクタ
+func NewTodo(
+	getAllTodosUseCase usecase.GetAllTodos,
+	getTodoByIDUseCase usecase.GetTodoByID,
+	createTodoUseCase usecase.CreateTodo,
+	updateTodoUseCase usecase.UpdateTodo,
+	deleteTodoUseCase usecase.DeleteTodo,
+) *Todo {
+	return &Todo{
 		getAllTodosUseCase: getAllTodosUseCase,
 		getTodoByIDUseCase: getTodoByIDUseCase,
 		createTodoUseCase:  createTodoUseCase,
@@ -37,7 +37,7 @@ func NewTodoController(
 }
 
 // RegisterRoutes はルーティング設定を行う
-func (c *TodoController) RegisterRoutes(router *gin.RouterGroup) {
+func (c *Todo) RegisterRoutes(router *gin.RouterGroup) {
 	todoRoutes := router.Group("/todos")
 	{
 		todoRoutes.GET("", c.List)
@@ -49,7 +49,7 @@ func (c *TodoController) RegisterRoutes(router *gin.RouterGroup) {
 }
 
 // List は全てのTodoを取得するハンドラー
-func (c *TodoController) List(ctx *gin.Context) {
+func (c *Todo) List(ctx *gin.Context) {
 	var query model.TodoQuery
 	if err := ctx.ShouldBindQuery(&query); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -66,7 +66,7 @@ func (c *TodoController) List(ctx *gin.Context) {
 }
 
 // Create は新しいTodoを作成するハンドラー
-func (c *TodoController) Create(ctx *gin.Context) {
+func (c *Todo) Create(ctx *gin.Context) {
 	var req model.Todo
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -83,7 +83,7 @@ func (c *TodoController) Create(ctx *gin.Context) {
 }
 
 // Read は指定されたIDのTodoを取得するハンドラー
-func (c *TodoController) Read(ctx *gin.Context) {
+func (c *Todo) Read(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	todo, err := c.getTodoByIDUseCase.Execute(ctx.Request.Context(), id)
@@ -100,7 +100,7 @@ func (c *TodoController) Read(ctx *gin.Context) {
 }
 
 // Update は指定されたIDのTodoを更新するハンドラー
-func (c *TodoController) Update(ctx *gin.Context) {
+func (c *Todo) Update(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var req model.Todo
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -122,7 +122,7 @@ func (c *TodoController) Update(ctx *gin.Context) {
 }
 
 // Delete は指定されたIDのTodoを削除するハンドラー
-func (c *TodoController) Delete(ctx *gin.Context) {
+func (c *Todo) Delete(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	err := c.deleteTodoUseCase.Execute(ctx.Request.Context(), id)

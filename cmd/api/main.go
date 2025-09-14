@@ -12,17 +12,17 @@ import (
 
 func main() {
 	// ロガーの初期化
-	logger.InitializeLogger()
+	logger.Initialize()
 
 	// データベースへの接続
-	_, err := db.InitializeDB("postgres://postgres:pass@localhost:5432/postgres")
+	_, err := db.Initialize("postgres://postgres:pass@localhost:5432/postgres")
 	if err != nil {
 		slog.Error("Failed to connect to database", slog.Any("error", err))
 		return
 	}
 
 	// サーバーの作成と起動
-	srv := server.NewServer()
+	srv := server.New()
 	srv.SetupRoutes()
 
 	if err := srv.Start(); err != nil {

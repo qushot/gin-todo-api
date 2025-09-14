@@ -10,20 +10,20 @@ import (
 	"github.com/qushot/gin-todo-api/internal/domain/repository"
 )
 
-// TodoRepository はPostgreSQLを使ったTodoRepositoryの実装
-type TodoRepository struct {
+// Todo はPostgreSQLを使ったTodoの実装
+type Todo struct {
 	conn *pgx.Conn
 }
 
-// NewTodoRepository はPostgresTodoRepositoryのコンストラクタ
-func NewTodoRepository(conn *pgx.Conn) repository.TodoRepository {
-	return &TodoRepository{
+// NewTodo は repository.Todo のコンストラクタ
+func NewTodo(conn *pgx.Conn) repository.Todo {
+	return &Todo{
 		conn: conn,
 	}
 }
 
 // FindAll は全てのTodoを取得する
-func (r *TodoRepository) FindAll(ctx context.Context, _ model.TodoQuery) ([]model.Todo, error) {
+func (r *Todo) FindAll(ctx context.Context, _ model.TodoQuery) ([]model.Todo, error) {
 	var todos []model.Todo
 	rows, err := r.conn.Query(ctx, "SELECT id, title, content, done FROM todo")
 	if err != nil {
@@ -47,7 +47,7 @@ func (r *TodoRepository) FindAll(ctx context.Context, _ model.TodoQuery) ([]mode
 }
 
 // FindByID はIDによるTodoの取得
-func (r *TodoRepository) FindByID(ctx context.Context, id string) (*model.Todo, error) {
+func (r *Todo) FindByID(ctx context.Context, id string) (*model.Todo, error) {
 	var t model.Todo
 	err := r.conn.QueryRow(ctx, "SELECT id, title, content, done FROM todo WHERE id = $1", id).
 		Scan(&t.ID, &t.Title, &t.Content, &t.Done)
@@ -62,7 +62,7 @@ func (r *TodoRepository) FindByID(ctx context.Context, id string) (*model.Todo, 
 }
 
 // Create は新しいTodoを作成する
-func (r *TodoRepository) Create(ctx context.Context, todo model.Todo) (*model.Todo, error) {
+func (r *Todo) Create(ctx context.Context, todo model.Todo) (*model.Todo, error) {
 	var t model.Todo
 	err := r.conn.QueryRow(ctx,
 		"INSERT INTO todo (title, content, done) VALUES ($1, $2, $3) RETURNING id, title, content, done",
@@ -76,7 +76,7 @@ func (r *TodoRepository) Create(ctx context.Context, todo model.Todo) (*model.To
 }
 
 // Update はTodoを更新する
-func (r *TodoRepository) Update(ctx context.Context, id string, todo model.Todo) (*model.Todo, error) {
+func (r *Todo) Update(ctx context.Context, id string, todo model.Todo) (*model.Todo, error) {
 	var t model.Todo
 	err := r.conn.QueryRow(ctx,
 		"UPDATE todo SET title = $2, content = $3, done = $4 WHERE id = $1 RETURNING id, title, content, done",
@@ -93,7 +93,7 @@ func (r *TodoRepository) Update(ctx context.Context, id string, todo model.Todo)
 }
 
 // Delete はTodoを削除する
-func (r *TodoRepository) Delete(ctx context.Context, id string) error {
+func (r *Todo) Delete(ctx context.Context, id string) error {
 	cmdTag, err := r.conn.Exec(ctx, "DELETE FROM todo WHERE id = $1", id)
 	if err != nil {
 		return err

@@ -23,8 +23,8 @@ type Server struct {
 	srv    *http.Server
 }
 
-// NewServer は新しいServerを作成する
-func NewServer() *Server {
+// New は新しいServerを作成する
+func New() *Server {
 	gin.SetMode(gin.DebugMode)
 	router := gin.Default()
 	router.Use(middleware.SetupMiddlewares)
@@ -37,17 +37,17 @@ func NewServer() *Server {
 // SetupRoutes はルーティングを設定する
 func (s *Server) SetupRoutes() {
 	// リポジトリの作成
-	todoRepo := postgresql.NewTodoRepository(db.GetDBConn())
+	todoRepo := postgresql.NewTodo(db.GetDBConn())
 
 	// ユースケースの作成
-	getAllTodosUseCase := usecase.NewGetAllTodosUseCase(todoRepo)
-	getTodoByIDUseCase := usecase.NewGetTodoByIDUseCase(todoRepo)
-	createTodoUseCase := usecase.NewCreateTodoUseCase(todoRepo)
-	updateTodoUseCase := usecase.NewUpdateTodoUseCase(todoRepo)
-	deleteTodoUseCase := usecase.NewDeleteTodoUseCase(todoRepo)
+	getAllTodosUseCase := usecase.NewGetAllTodos(todoRepo)
+	getTodoByIDUseCase := usecase.NewGetTodoByID(todoRepo)
+	createTodoUseCase := usecase.NewCreateTodo(todoRepo)
+	updateTodoUseCase := usecase.NewUpdateTodo(todoRepo)
+	deleteTodoUseCase := usecase.NewDeleteTodo(todoRepo)
 
 	// コントローラーの作成
-	todoController := controllers.NewTodoController(
+	todoController := controllers.NewTodo(
 		getAllTodosUseCase,
 		getTodoByIDUseCase,
 		createTodoUseCase,

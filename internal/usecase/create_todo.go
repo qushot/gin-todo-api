@@ -7,24 +7,24 @@ import (
 	"github.com/qushot/gin-todo-api/internal/domain/repository"
 )
 
-// CreateTodoUseCase は新しいTodoを作成するユースケースを表すインターフェース
-type CreateTodoUseCase interface {
+// CreateTodo は新しいTodoを作成するユースケースを表すインターフェース
+type CreateTodo interface {
 	Execute(ctx context.Context, todo model.Todo) (*model.Todo, error)
 }
 
-// createTodoUseCase はCreateTodoUseCaseの実装
-type createTodoUseCase struct {
-	todoRepo repository.TodoRepository
+// createTodo は usecase.CreateTodo の実装
+type createTodo struct {
+	todoRepo repository.Todo
 }
 
-// NewCreateTodoUseCase は新しいTodoを作成するユースケースのコンストラクタ
-func NewCreateTodoUseCase(todoRepo repository.TodoRepository) CreateTodoUseCase {
-	return &createTodoUseCase{
+// NewCreateTodo は usecase.CreateTodo のコンストラクタ
+func NewCreateTodo(todoRepo repository.Todo) CreateTodo {
+	return &createTodo{
 		todoRepo: todoRepo,
 	}
 }
 
 // Execute は新しいTodoを作成する
-func (uc *createTodoUseCase) Execute(ctx context.Context, todo model.Todo) (*model.Todo, error) {
+func (uc *createTodo) Execute(ctx context.Context, todo model.Todo) (*model.Todo, error) {
 	return uc.todoRepo.Create(ctx, todo)
 }

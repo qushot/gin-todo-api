@@ -6,8 +6,8 @@ import (
 	"github.com/qushot/gin-todo-api/internal/domain/model"
 )
 
-// TodoRepository はTodoのデータ操作を担当するインターフェース
-type TodoRepository interface {
+// Todo はTodoのデータ操作を担当するインターフェース
+type Todo interface {
 	FindAll(ctx context.Context, query model.TodoQuery) ([]model.Todo, error)
 	FindByID(ctx context.Context, id string) (*model.Todo, error)
 	Create(ctx context.Context, todo model.Todo) (*model.Todo, error)
