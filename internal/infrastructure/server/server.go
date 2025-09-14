@@ -12,7 +12,7 @@ import (
 
 	"github.com/qushot/gin-todo-api/internal/infrastructure/db"
 	"github.com/qushot/gin-todo-api/internal/infrastructure/middleware"
-	"github.com/qushot/gin-todo-api/internal/infrastructure/persistence"
+	"github.com/qushot/gin-todo-api/internal/infrastructure/persistence/postgresql"
 	"github.com/qushot/gin-todo-api/internal/interfaces/controllers"
 	"github.com/qushot/gin-todo-api/internal/usecase"
 )
@@ -37,7 +37,7 @@ func NewServer() *Server {
 // SetupRoutes はルーティングを設定する
 func (s *Server) SetupRoutes() {
 	// リポジトリの作成
-	todoRepo := persistence.NewPostgresTodoRepository(db.GetDBConn())
+	todoRepo := postgresql.NewTodoRepository(db.GetDBConn())
 
 	// ユースケースの作成
 	getAllTodosUseCase := usecase.NewGetAllTodosUseCase(todoRepo)
