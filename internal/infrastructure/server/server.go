@@ -26,11 +26,11 @@ type Server struct {
 // New は新しいServerを作成する
 func New() *Server {
 	gin.SetMode(gin.DebugMode)
-	router := gin.Default()
-	router.Use(middleware.SetupMiddlewares)
+	r := gin.Default()
+	r.Use(middleware.SetupMiddlewares)
 
 	return &Server{
-		router: router,
+		router: r,
 	}
 }
 
