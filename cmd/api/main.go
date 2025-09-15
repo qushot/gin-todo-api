@@ -7,7 +7,7 @@ import (
 
 	"github.com/qushot/gin-todo-api/internal/infrastructure/db"
 	"github.com/qushot/gin-todo-api/internal/infrastructure/logger"
-	"github.com/qushot/gin-todo-api/internal/infrastructure/server"
+	"github.com/qushot/gin-todo-api/internal/interfaces/server"
 )
 
 func main() {

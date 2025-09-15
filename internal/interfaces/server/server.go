@@ -11,9 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/qushot/gin-todo-api/internal/infrastructure/db"
-	"github.com/qushot/gin-todo-api/internal/infrastructure/middleware"
 	"github.com/qushot/gin-todo-api/internal/infrastructure/persistence/postgresql"
 	"github.com/qushot/gin-todo-api/internal/interfaces/controllers"
+	"github.com/qushot/gin-todo-api/internal/interfaces/middleware"
 	"github.com/qushot/gin-todo-api/internal/usecase"
 )
 
