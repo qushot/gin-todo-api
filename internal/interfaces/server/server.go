@@ -27,7 +27,7 @@ type Server struct {
 func New() *Server {
 	gin.SetMode(gin.DebugMode)
 	r := gin.Default()
-	r.Use(middleware.SetupMiddlewares)
+	r.Use(middleware.TraceContext, middleware.DumpRequestBody)
 
 	return &Server{
 		router: r,
