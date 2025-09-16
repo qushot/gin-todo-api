@@ -4,20 +4,19 @@ import (
 	"cmp"
 	"context"
 	"fmt"
-	"io"
 	"log/slog"
 	"os"
 
 	"go.opentelemetry.io/otel/trace"
 )
 
-// customJSONHandler is a custom handler for slog.JSONHandler
-type customJSONHandler struct {
-	*slog.JSONHandler
+// customHandler is a custom handler for slog.JSONHandler
+type customHandler struct {
+	slog.Handler
 }
 
 // Handle is a override implementation of slog.Handler.Handle
-func (h *customJSONHandler) Handle(ctx context.Context, r slog.Record) error {
+func (h *customHandler) Handle(ctx context.Context, r slog.Record) error {
 	sc := trace.SpanContextFromContext(ctx)
 	if sc.IsValid() {
 		projectID := cmp.Or(os.Getenv("GOOGLE_CLOUD_PROJECT"), "unknown")
@@ -27,27 +26,20 @@ func (h *customJSONHandler) Handle(ctx context.Context, r slog.Record) error {
 		)
 	}
 
-	return h.JSONHandler.Handle(ctx, r)
+	return h.Handler.Handle(ctx, r)
 }
 
 // WithAttrs is a override implementation of slog.Handler.WithAttrs
-func (h *customJSONHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
-	return &customJSONHandler{
-		JSONHandler: h.JSONHandler.WithAttrs(attrs).(*slog.JSONHandler),
+func (h *customHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+	return &customHandler{
+		Handler: h.Handler.WithAttrs(attrs),
 	}
 }
 
 // WithGroup is a override implementation of slog.Handler.WithGroup
-func (h *customJSONHandler) WithGroup(name string) slog.Handler {
-	return &customJSONHandler{
-		JSONHandler: h.JSONHandler.WithGroup(name).(*slog.JSONHandler),
-	}
-}
-
-// NewCustomJSONHandler is a factory method for SlogHandler
-func NewCustomJSONHandler(w io.Writer, opts *slog.HandlerOptions) slog.Handler {
-	return &customJSONHandler{
-		JSONHandler: slog.NewJSONHandler(w, opts),
+func (h *customHandler) WithGroup(name string) slog.Handler {
+	return &customHandler{
+		Handler: h.Handler.WithGroup(name),
 	}
 }
 
@@ -73,11 +65,13 @@ func Initialize() {
 		}
 		return a
 	}
-	logger := slog.New(NewCustomJSONHandler(os.Stdout, &slog.HandlerOptions{
-		AddSource:   true,
-		Level:       slog.LevelDebug,
-		ReplaceAttr: replace,
-	}))
+	logger := slog.New(&customHandler{
+		Handler: slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+			AddSource:   true,
+			Level:       slog.LevelDebug,
+			ReplaceAttr: replace,
+		}),
+	})
 	slog.SetDefault(logger)
 
 	slog.Info("Logger initialized")
