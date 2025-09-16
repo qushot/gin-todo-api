@@ -30,6 +30,20 @@ func (h *customJSONHandler) Handle(ctx context.Context, r slog.Record) error {
 	return h.JSONHandler.Handle(ctx, r)
 }
 
+// WithAttrs is a override implementation of slog.Handler.WithAttrs
+func (h *customJSONHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+	return &customJSONHandler{
+		JSONHandler: h.JSONHandler.WithAttrs(attrs).(*slog.JSONHandler),
+	}
+}
+
+// WithGroup is a override implementation of slog.Handler.WithGroup
+func (h *customJSONHandler) WithGroup(name string) slog.Handler {
+	return &customJSONHandler{
+		JSONHandler: h.JSONHandler.WithGroup(name).(*slog.JSONHandler),
+	}
+}
+
 // NewCustomJSONHandler is a factory method for SlogHandler
 func NewCustomJSONHandler(w io.Writer, opts *slog.HandlerOptions) slog.Handler {
 	return &customJSONHandler{
