@@ -10,11 +10,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/qushot/gin-todo-api/internal/infrastructure/db"
-	"github.com/qushot/gin-todo-api/internal/infrastructure/persistence/postgresql"
-	"github.com/qushot/gin-todo-api/internal/interfaces/controllers"
+	"github.com/qushot/gin-todo-api/internal/di"
 	"github.com/qushot/gin-todo-api/internal/interfaces/middleware"
-	"github.com/qushot/gin-todo-api/internal/usecase"
 )
 
 // Server はAPIサーバーを表す
@@ -36,29 +33,12 @@ func New() *Server {
 
 // SetupRoutes はルーティングを設定する
 func (s *Server) SetupRoutes() {
-	// リポジトリの作成
-	todoRepo := postgresql.NewTodo(db.GetDBConn())
-
-	// ユースケースの作成
-	getAllTodosUseCase := usecase.NewGetAllTodos(todoRepo)
-	getTodoByIDUseCase := usecase.NewGetTodoByID(todoRepo)
-	createTodoUseCase := usecase.NewCreateTodo(todoRepo)
-	updateTodoUseCase := usecase.NewUpdateTodo(todoRepo)
-	deleteTodoUseCase := usecase.NewDeleteTodo(todoRepo)
-
-	// コントローラーの作成
-	todoController := controllers.NewTodo(
-		getAllTodosUseCase,
-		getTodoByIDUseCase,
-		createTodoUseCase,
-		updateTodoUseCase,
-		deleteTodoUseCase,
-	)
-
+	// DI Containerからコントローラーを取得
+	c := di.GetContainer()
 	// ルートグループの設定
 	baseRouter := s.router.Group("/api/v1")
 	{
-		todoController.RegisterRoutes(baseRouter)
+		c.TodoController.RegisterRoutes(baseRouter)
 	}
 }
 
