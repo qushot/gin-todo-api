@@ -1,13 +1,13 @@
-//go:build !in_memory
+//go:build in_memory
 
 package di
 
 import (
+	"log/slog"
 	"sync"
 
 	"github.com/qushot/gin-todo-api/internal/domain/repository"
-	"github.com/qushot/gin-todo-api/internal/infrastructure/db"
-	"github.com/qushot/gin-todo-api/internal/infrastructure/persistence/postgresql"
+	"github.com/qushot/gin-todo-api/internal/infrastructure/persistence/inmemory"
 	"github.com/qushot/gin-todo-api/internal/interfaces/controllers"
 	"github.com/qushot/gin-todo-api/internal/usecase"
 )
@@ -31,9 +31,10 @@ type container struct {
 
 func GetContainer() *container {
 	once.Do(func() {
+		slog.Info("NOTE: Use In-Memory Database")
+
 		// repositories
-		dbConn := db.GetDBConn()
-		todoRepo := postgresql.NewTodo(dbConn)
+		todoRepo := inmemory.NewTodo()
 
 		// use cases
 		getAllTodosUseCase := usecase.NewGetAllTodos(todoRepo)

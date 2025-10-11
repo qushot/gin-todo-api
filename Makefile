@@ -2,6 +2,10 @@
 run: postgres-up
 	@go tool air
 
+.PHONY: run-in-memory
+run-in-memory:
+	@go tool air --build.cmd "go build -tags in_memory -buildvcs=false -o ./tmp/main ./cmd/api"
+
 .PHONY: build-mcp
 build-mcp:
 	@go build -o mcp ./mcp

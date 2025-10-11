@@ -14,7 +14,7 @@
 - [ ] データベースの設定
 - [ ] SQL 文 をファイルに切り出す
 - [ ] StackTrace のライブラリをいくつか試したい
-- [ ] ビルドタグで on-memory と PostgreSQL を切り替えたい
+- [x] ビルドタグで in-memory と PostgreSQL を切り替えたい
 - [ ] MCP サーバーで API を操作したい
   - API をラップした MCP は作ってみた。そのうち cmd/mcp 的な感じでディレクトリを掘っていい感じにしたい。。
 
