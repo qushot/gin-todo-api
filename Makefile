@@ -1,5 +1,5 @@
 .PHONY: run
-run: postgres-up
+run: postgres-up redis-up
 	@go tool air
 
 .PHONY: run-in-memory
@@ -29,6 +29,26 @@ postgres-logs:
 .PHONY: postgres-exec
 postgres-exec:
 	@docker compose exec postgres psql -U postgres -d postgres
+
+.PHONY: redis-up
+redis-up:
+	@docker compose up -d redis
+
+.PHONY: redis-down
+redis-down:
+	@docker compose down redis
+
+.PHONY: redis-volumes-down
+redis-volumes-down:
+	@docker compose down -v redis
+
+.PHONY: redis-logs
+redis-logs:
+	@docker compose logs -f redis
+
+.PHONY: redis-exec
+redis-exec:
+	@docker compose exec redis redis-cli	
 
 .PHONY: openapi-generator
 openapi-generator:

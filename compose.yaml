@@ -15,6 +15,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres/init:/docker-entrypoint-initdb.d
 
+  redis:
+    image: redis:8
+    restart: always
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+
   openapi-generator:
     image: openapitools/openapi-generator-cli:latest
     user: 1000:1000
@@ -43,3 +52,4 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
