@@ -4,6 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "*"
         # メジャーバージョンの更新は無視
