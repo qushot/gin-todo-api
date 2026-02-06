@@ -27,12 +27,12 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ github.head_ref }}
       - name: "TODO: マイグレーションツールの実行に変更する"
         run: psql -h localhost -U postgres -d postgres < ./postgres/init/01_setup.sql
-      - uses: k1low/setup-tbls@v1
+      - uses: k1low/setup-tbls@f25e3d013a596865b2db90dac7ee19e9f15b5780 # v1.4.0
       - run: tbls doc --rm-dist "postgres://postgres:pass@localhost:5432/postgres?sslmode=disable&search_path=public"
       - name: Check diff
         id: diff
